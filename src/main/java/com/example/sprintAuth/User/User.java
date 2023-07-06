@@ -3,6 +3,7 @@ package com.example.sprintAuth.User;
 import java.util.Collection;
 import java.util.List;
 
+
 import javax.validation.constraints.Email;
 
 import javax.validation.constraints.Size;
@@ -31,7 +32,7 @@ import lombok.NoArgsConstructor;
 public class User implements UserDetails {
     @Id
     @GeneratedValue
-    private long id;
+    private Integer id;
 
     @NotBlank
     @Size(max = 20)
