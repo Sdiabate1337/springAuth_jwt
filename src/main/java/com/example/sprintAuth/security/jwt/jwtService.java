@@ -1,12 +1,19 @@
 package com.example.sprintAuth.security.jwt;
 
 import java.security.Key;
+import java.sql.Date;
 import java.util.Base64;
+import java.util.HashMap;
 
+import org.hibernate.mapping.Map;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.mongodb.Function;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 @Service
 public class jwtService {
@@ -21,7 +28,47 @@ public class jwtService {
     public String extractUsername(String token) {
         // Extract the username from the token
         // Implement your logic here to extract the username from the token
-        return null;
+        return extractClaims(token,  Claims::getSubject);
+    }
+
+    public  <T> T extractClaims(
+        String token, 
+        Function<Claims, T> claimRsolver)
+    {
+        final Claims claims = extractAllClaims(token);
+        return claimRsolver.apply(claims);
+    }
+
+    public String generateToken(UserDetails UserDetails){
+        return generateToken(new HashMap<>(), UserDetails);
+    }
+
+    public String generateToken(
+       Map<String, Object> extraClaims,
+        UserDetails userDetails
+    ){
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean isTokenVlaid(String token, UserDetails UserDetails)
+    {
+        final String username = extractUsername(token);
+        return (username.equals(UserDetails.getUsername())) && !isTokenExpire(token);
+    }
+
+    private boolean isTokenExpire(String token) {
+        return extractExpiration(token).before(new Date(0));
+    }
+
+    private java.util.Date extractExpiration(String token) {
+        return extractClaims(token, Claims::getExpiration);
     }
 
     /**
