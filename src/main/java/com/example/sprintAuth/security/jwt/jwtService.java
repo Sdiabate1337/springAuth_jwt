@@ -5,7 +5,7 @@ import java.sql.Date;
 import java.util.Base64;
 import java.util.HashMap;
 
-import org.hibernate.mapping.Map;
+import java.util.Map;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,7 @@ public class jwtService {
                 .compact();
     }
 
-    public boolean isTokenVlaid(String token, UserDetails UserDetails)
+    public boolean isTokenValid(String token, UserDetails UserDetails)
     {
         final String username = extractUsername(token);
         return (username.equals(UserDetails.getUsername())) && !isTokenExpire(token);
