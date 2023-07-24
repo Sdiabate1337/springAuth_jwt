@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class jwtAuthFilter extends OncePerRequestFilter 
 {
     private final jwtService jwtservice;
+    private final UserDetailsService  userDetailsService;
 
 
     @Override
@@ -47,7 +49,7 @@ public class jwtAuthFilter extends OncePerRequestFilter
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null)
             {
                 //userdetail fron database
-                UserDetails userDetails = this.userDetailsService.LoadUserByUsername(userEmail);
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
                 // check if token generated is valid
                 if (jwtService.isTokenValid(jwt, userDetails))
